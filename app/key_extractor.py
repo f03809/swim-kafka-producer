@@ -27,6 +27,20 @@ _itws_airport_patterns = [
     r"<airports>([^<]+)</airports>",
 ]
 
+_primary_aircraft_patterns = [
+    r'"aid"\s*:\s*"([^"]+)"',
+    r'"-aircraftIdentification"\s*:\s*"([^"]+)"',
+    r'"aircraftIdentification"\s*[:=]\s*"([^"]+)"',
+    r'"acid"\s*[:=]\s*"([^"]+)"',
+    r'"callsign"\s*[:=]\s*"([^"]+)"',
+    r'\baid\s*=\s*"([^"]+)"',
+    r"<aid>([^<]+)</aid>",
+    r"<acid>([^<]+)</acid>",
+    r"<callSign>([^<]+)</callSign>",
+    r"<aircraftIdentification[^>]*>([^<]+)</aircraftIdentification>",
+    r'\baircraftIdentification\s*=\s*"([^"]+)"',
+]
+
 
 def _first_match(payload: str, patterns: list[str]) -> str | None:
     for pattern in patterns:
@@ -62,13 +76,26 @@ def _itws_key(payload: str) -> str:
     alert_raw = _first_match(payload, _itws_alert_patterns)
     alert = _derive_alert_type(alert_raw) if alert_raw else "MULT"
     locs = _all_locations(payload, _itws_airport_patterns)
-    if len(locs) > 1:
-        airport = "MULT"
-    elif len(locs) == 1:
-        airport = next(iter(locs))
-    else:
-        airport = "MULT"
+    airport = _one_or_mult(locs)
     return f"ITWS_{alert}_{airport}"
+
+
+def _one_or_mult(locs: set[str]) -> str:
+    if len(locs) > 1:
+        return "MULT"
+    if len(locs) == 1:
+        return next(iter(locs))
+    return "MULT"
+
+
+def _primary_location(payload: str, patterns: list[str]) -> str | None:
+    for pattern in patterns:
+        locs = _all_locations(payload, [pattern])
+        if len(locs) == 1:
+            return next(iter(locs))
+        if len(locs) > 1:
+            return "MULT"
+    return None
 
 
 def extract_key(payload: str, service: str, settings: Settings) -> str:
@@ -80,20 +107,22 @@ def extract_key(payload: str, service: str, settings: Settings) -> str:
 
     if service_lower == "notam":
         locs = _all_locations(payload, settings.swim_key_airport_patterns)
+        if msg_type:
+            locs.discard(msg_type)
+        loc = _one_or_mult(locs)
     else:
-        locs = _all_locations(payload, settings.swim_key_flight_patterns)
-        if not locs:
-            locs = _all_locations(payload, settings.swim_key_airport_patterns)
-
-    if msg_type:
-        locs.discard(msg_type)
-
-    if len(locs) > 1:
-        loc = "MULT"
-    elif len(locs) == 1:
-        loc = next(iter(locs))
-    else:
-        loc = "MULT"
+        loc = _primary_location(payload, _primary_aircraft_patterns)
+        if loc is None:
+            locs = _all_locations(payload, settings.swim_key_flight_patterns)
+            if msg_type:
+                locs.discard(msg_type)
+            loc = _one_or_mult(locs)
+            if loc == "MULT" and not locs:
+                # no flight identifier found; try airports as a last resort
+                locs = _all_locations(payload, settings.swim_key_airport_patterns)
+                if msg_type:
+                    locs.discard(msg_type)
+                loc = _one_or_mult(locs)
 
     prefix = msg_type if msg_type else service.upper()
     return f"{prefix}_{loc}"
