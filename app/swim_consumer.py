@@ -110,6 +110,9 @@ class _SwimMessageHandler(MessageHandler):
                 else ""
             )
         payload = _xml_to_json(payload)
+        if not payload.strip():
+            _set_state(self._service, "connected", received_at=datetime.now(UTC))
+            return
         received_at = datetime.now(UTC)
         _set_state(self._service, "connected", received_at=received_at)
         self._incoming.put({
