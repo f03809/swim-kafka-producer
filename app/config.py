@@ -56,6 +56,7 @@ class Settings(BaseSettings):
             r'<acid>([^<]+)</acid>',
             r'<callSign>([^<]+)</callSign>',
             r'<aircraftIdentification[^>]*>([^<]+)</aircraftIdentification>',
+            r'\baircraftIdentification\s*=\s*"([^"]+)"',
             r'<flightRef[^>]*>([^<]+)</flightRef>',
             r'<gufi>([^<]+)</gufi>',
         ]
