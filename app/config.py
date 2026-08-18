@@ -47,6 +47,8 @@ class Settings(BaseSettings):
 
     swim_key_flight_patterns: list[str] = Field(
         default_factory=lambda: [
+            r'"msgType"\s*:\s*"([^"]+)"',
+            r'<msgType>([^<]+)</msgType>',
             r'"aid"\s*:\s*"([^"]+)"',
             r'"-aircraftIdentification"\s*:\s*"([^"]+)"',
             r'"aircraftIdentification"\s*[:=]\s*"([^"]+)"',
