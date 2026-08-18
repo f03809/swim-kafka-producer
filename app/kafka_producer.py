@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import queue
-import uuid
 from contextlib import suppress
 from datetime import UTC, datetime
 from typing import Any
