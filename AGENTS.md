@@ -2,17 +2,15 @@
 
 ## Deployment
 
-The project uses GitHub Actions to build a Docker image, push it to GHCR, and deploy to a Kubernetes cluster via `kubectl` on an SSH jump host.
+The project uses GitHub Actions to build a Docker image, push it to GHCR, and deploy to a Kubernetes cluster via a self-hosted runner on the Proxmox VM.
 
 ### Required GitHub secrets
 
 | Secret | Purpose |
 |---|---|
-| `DEPLOY_HOST` | IP/hostname of the SSH host that can reach the K8s API |
-| `DEPLOY_USER` | SSH user on `DEPLOY_HOST` |
-| `DEPLOY_SSH_PRIVATE_KEY` | SSH private key for `DEPLOY_USER` (public key must be in `~/.ssh/authorized_keys`) |
-| `DEPLOY_SSH_PORT` | SSH port (optional, defaults to `22`) |
-| `KUBECONFIG_PATH` | Absolute path to a valid `kubeconfig` on `DEPLOY_HOST` (optional, defaults to `~/.kube/config`) |
+| `SWIM_USERNAME` | FAA SWIM username |
+| `SWIM_PASSWORD` | FAA SWIM password |
+| `KUBECONFIG_PATH` | Absolute path to a valid `kubeconfig` on the self-hosted runner (optional, defaults to `~/.kube/config`) |
 
 ### Target host setup (Proxmox + k3s)
 
