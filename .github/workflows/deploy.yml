@@ -48,32 +48,20 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
-      - uses: azure/setup-kubectl@v4
-        with:
-          version: v1.30.0
-
-      - uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-          ssh-auth-sock: /tmp/ssh_agent.sock
+      - name: Write K8s secrets env
+        run: |
+          cat > k8s/base/secrets.env <<EOF
+          SWIM_USERNAME=${{ secrets.SWIM_USERNAME }}
+          SWIM_PASSWORD=${{ secrets.SWIM_PASSWORD }}
+          EOF
 
       - name: Deploy to Kubernetes
         env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_SSH_PORT: ${{ secrets.DEPLOY_SSH_PORT }}
-          KUBECONFIG_PATH: ${{ secrets.KUBECONFIG_PATH }}
+          KUBECONFIG: ${{ secrets.KUBECONFIG_PATH || '~/.kube/config' }}
         run: |
           set -e
-          PORT="${DEPLOY_SSH_PORT:-22}"
-          KPATH="${KUBECONFIG_PATH:-~/.kube/config}"
-          ssh -o StrictHostKeyChecking=no \
-              -o UserKnownHostsFile=/dev/null \
-              -p "$PORT" \
-              "$DEPLOY_USER@$DEPLOY_HOST" \
-              "KUBECONFIG=$KPATH kubectl apply -f -" \
-              < <(kubectl kustomize k8s/overlays/prod)
+          kubectl kustomize k8s/overlays/prod | kubectl apply -f -
