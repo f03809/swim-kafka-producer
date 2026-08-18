@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import queue
 import re
@@ -7,6 +8,8 @@ import uuid
 from contextlib import suppress
 from datetime import UTC, datetime
 from typing import Any
+
+import xmltodict
 
 from solace.messaging.config.solace_properties import (
     authentication_properties,
@@ -41,6 +44,22 @@ def _set_state(
         if error is not None:
             entry["last_error"] = error
             entry["last_error_at"] = now
+
+
+def _xml_to_json(payload: str) -> str:
+    stripped = payload.strip()
+    if not (stripped.startswith("<") and (stripped.startswith("<?xml") or "<" in stripped[:50])):
+        return payload
+    try:
+        parsed = xmltodict.parse(
+            payload,
+            attr_prefix="-",
+            cdata_key="#content",
+        )
+        return json.dumps(parsed, ensure_ascii=False, separators=(",", ":"))
+    except Exception:
+        logger.warning("Failed to convert XML payload to JSON, passing through as string")
+        return payload
 
 
 class _SolaceWarningHandler(logging.Handler):
@@ -90,6 +109,7 @@ class _SwimMessageHandler(MessageHandler):
                 if raw is not None
                 else ""
             )
+        payload = _xml_to_json(payload)
         received_at = datetime.now(UTC)
         _set_state(self._service, "connected", received_at=received_at)
         self._incoming.put({

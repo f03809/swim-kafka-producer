@@ -10,6 +10,7 @@ dependencies = [
     "pydantic-settings>=2.3.0",
     "python-json-logger>=2.0.0",
     "solace-pubsubplus==1.10.0",
+    "xmltodict>=0.13.0",
 ]
 
 [project.optional-dependencies]
