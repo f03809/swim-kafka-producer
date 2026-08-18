@@ -53,7 +53,7 @@ def _xml_to_json(payload: str) -> str:
     try:
         parsed = xmltodict.parse(
             payload,
-            attr_prefix="-",
+            attr_prefix="",
             cdata_key="#content",
         )
         return json.dumps(parsed, ensure_ascii=False, separators=(",", ":"))
