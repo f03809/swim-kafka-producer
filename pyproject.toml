@@ -1,0 +1,50 @@
+[project]
+name = "swim-kafka-producer"
+version = "0.1.0"
+description = "FAA SWIM to Kafka producer."
+requires-python = ">=3.12"
+dependencies = [
+    "aiokafka>=0.11.0",
+    "prometheus-client>=0.20.0",
+    "pydantic>=2.8.0",
+    "pydantic-settings>=2.3.0",
+    "python-json-logger>=2.0.0",
+    "solace-pubsubplus==1.10.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2.0",
+    "pytest-asyncio>=0.23.0",
+    "ruff>=0.5.0",
+    "mypy>=1.11.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.uv]
+managed = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]
+ignore = ["E501", "B008", "UP017", "UP035", "UP041"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = false
+warn_return_any = true
+warn_unused_ignores = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"

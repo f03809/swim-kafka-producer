@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: swim-subscriptions
+  namespace: swim
+data:
+  tfms: |
+    [{"service": "tfms", "enabled": true, "host": "tcps://ems1.swim.faa.gov:55443", "vpn": "TFMS", "queue": "mccallumtl.gmail.com.TFMS.bea0dfd4-c1b5-47da-8002-36571d40891e.OUT"}]
+  tbfm: |
+    [{"service": "tbfm", "enabled": true, "host": "tcps://ems2.swim.faa.gov:55443", "vpn": "TBFM", "queue": "mccallumtl.gmail.com.TBFM.4170adf8-1fae-468e-8f88-d68d9c4b089e.OUT"}]
+  sfdps: |
+    [{"service": "sfdps", "enabled": true, "host": "tcps://ems1.swim.faa.gov:55443", "vpn": "FDPS", "queue": "mccallumtl.gmail.com.FDPS.9a62aaef-c87f-4d28-903a-4f59acaba6b2.OUT"}]
+  notam: |
+    [{"service": "notam", "enabled": true, "host": "tcps://ems1.swim.faa.gov:55443", "vpn": "AIM_FNS", "queue": "mccallumtl.gmail.com.AIM_FNS.bb8c5859-3915-49a2-bd6b-11359c72d825.OUT"}]
+  stdds: |
+    [{"service": "stdds", "enabled": true, "host": "tcps://ems1.swim.faa.gov:55443", "vpn": "STDDS", "queue": "mccallumtl.gmail.com.STDDS.ed47d98e-5bed-4f9c-94bb-c82ee48b9188.OUT"}]
+  tfdm: |
+    [{"service": "tfdm", "enabled": true, "host": "tcps://ems3.swim.faa.gov:55443", "vpn": "TFDM", "queue": "mccallumtl.gmail.com.TFDM.fccb7cd0-3d66-433e-9930-7f65e5f7edcf.OUT"}]
+  itws: |
+    [{"service": "itws", "enabled": true, "host": "tcps://ems1.swim.faa.gov:55443", "vpn": "ITWS", "queue": "mccallumtl.gmail.com.ITWS.3626bbbe-e8a2-4254-82da-122699719d29.OUT"}]

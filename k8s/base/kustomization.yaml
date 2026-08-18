@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: swim
+
+resources:
+  - namespace.yaml
+  - swim-kafka-config.yaml
+  - swim-subscriptions-config.yaml
+  - deployment.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+secretGenerator:
+  - name: swim-secrets
+    envs:
+      - secrets.env

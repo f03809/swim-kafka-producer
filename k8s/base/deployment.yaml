@@ -1,0 +1,405 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swim-producer-tfms
+  namespace: swim
+  labels:
+    app: swim-producer
+    service: tfms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: swim-producer
+      service: tfms
+  template:
+    metadata:
+      labels:
+        app: swim-producer
+        service: tfms
+    spec:
+      containers:
+        - name: producer
+          image: swim-kafka-producer:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: swim-kafka
+            - secretRef:
+                name: swim-secrets
+          env:
+            - name: SWIM_SUBSCRIPTIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: swim-subscriptions
+                  key: tfms
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swim-producer-tbfm
+  namespace: swim
+  labels:
+    app: swim-producer
+    service: tbfm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: swim-producer
+      service: tbfm
+  template:
+    metadata:
+      labels:
+        app: swim-producer
+        service: tbfm
+    spec:
+      containers:
+        - name: producer
+          image: swim-kafka-producer:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: swim-kafka
+            - secretRef:
+                name: swim-secrets
+          env:
+            - name: SWIM_SUBSCRIPTIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: swim-subscriptions
+                  key: tbfm
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swim-producer-sfdps
+  namespace: swim
+  labels:
+    app: swim-producer
+    service: sfdps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: swim-producer
+      service: sfdps
+  template:
+    metadata:
+      labels:
+        app: swim-producer
+        service: sfdps
+    spec:
+      containers:
+        - name: producer
+          image: swim-kafka-producer:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: swim-kafka
+            - secretRef:
+                name: swim-secrets
+          env:
+            - name: SWIM_SUBSCRIPTIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: swim-subscriptions
+                  key: sfdps
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swim-producer-notam
+  namespace: swim
+  labels:
+    app: swim-producer
+    service: notam
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: swim-producer
+      service: notam
+  template:
+    metadata:
+      labels:
+        app: swim-producer
+        service: notam
+    spec:
+      containers:
+        - name: producer
+          image: swim-kafka-producer:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: swim-kafka
+            - secretRef:
+                name: swim-secrets
+          env:
+            - name: SWIM_SUBSCRIPTIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: swim-subscriptions
+                  key: notam
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swim-producer-stdds
+  namespace: swim
+  labels:
+    app: swim-producer
+    service: stdds
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: swim-producer
+      service: stdds
+  template:
+    metadata:
+      labels:
+        app: swim-producer
+        service: stdds
+    spec:
+      containers:
+        - name: producer
+          image: swim-kafka-producer:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: swim-kafka
+            - secretRef:
+                name: swim-secrets
+          env:
+            - name: SWIM_SUBSCRIPTIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: swim-subscriptions
+                  key: stdds
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swim-producer-tfdm
+  namespace: swim
+  labels:
+    app: swim-producer
+    service: tfdm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: swim-producer
+      service: tfdm
+  template:
+    metadata:
+      labels:
+        app: swim-producer
+        service: tfdm
+    spec:
+      containers:
+        - name: producer
+          image: swim-kafka-producer:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: swim-kafka
+            - secretRef:
+                name: swim-secrets
+          env:
+            - name: SWIM_SUBSCRIPTIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: swim-subscriptions
+                  key: tfdm
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swim-producer-itws
+  namespace: swim
+  labels:
+    app: swim-producer
+    service: itws
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: swim-producer
+      service: itws
+  template:
+    metadata:
+      labels:
+        app: swim-producer
+        service: itws
+    spec:
+      containers:
+        - name: producer
+          image: swim-kafka-producer:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: swim-kafka
+            - secretRef:
+                name: swim-secrets
+          env:
+            - name: SWIM_SUBSCRIPTIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: swim-subscriptions
+                  key: itws
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

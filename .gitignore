@@ -1,0 +1,21 @@
+# Environment
+.env
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+dist/
+build/
+
+# K8s local secrets
+k8s/base/secrets.env
+k8s/overlays/*/secrets.env
+
+# Local dev
+.DS_Store
