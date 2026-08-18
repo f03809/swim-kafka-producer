@@ -66,6 +66,8 @@ class Settings(BaseSettings):
     )
     swim_key_airport_patterns: list[str] = Field(
         default_factory=lambda: [
+            r'"(?:aixm:)?designator"\s*:\s*"([^"]+)"',
+            r'"(?:event:)?location"\s*:\s*"([^"]+)"',
             r'"source_id"\s*[:=]\s*"([^"]+)"',
             r'"airports"\s*[:=]\s*"([^"]+)"',
             r'"itws_sites"\s*[:=]\s*"([^"]+)"',
@@ -73,6 +75,8 @@ class Settings(BaseSettings):
             r'"airportId"\s*[:=]\s*"([^"]+)"',
             r'"airport"\s*[:=]\s*"([^"]+)"',
             r'"location"\s*[:=]\s*"([^"]+)"',
+            r'\b(?:aixm:)?designator\s*=\s*"([^"]+)"',
+            r'\b(?:event:)?location\s*=\s*"([^"]+)"',
             r'\bsource_id\s*=\s*"([^"]+)"',
             r'\bairports\s*=\s*"([^"]+)"',
             r'\bitws_sites\s*=\s*"([^"]+)"',
