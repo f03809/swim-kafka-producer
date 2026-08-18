@@ -89,6 +89,8 @@ class Settings(BaseSettings):
         ]
     )
 
+    swim_itws_drop_inactive_alerts: bool = True
+
     health_port: int = 8080
     health_path: str = "/health"
     metrics_path: str = "/metrics"

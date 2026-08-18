@@ -13,6 +13,20 @@ _msg_type_patterns = [
     r"<type>([^<]+)</type>",
 ]
 
+_itws_alert_patterns = [
+    r'"product_msg_name"\s*:\s*"([^"]+)"',
+    r"<product_msg_name>([^<]+)</product_msg_name>",
+    r'"trnal_message"\s*:\s*"([^"]+)"',
+    r"<trnal_message>([^<]+)</trnal_message>",
+]
+
+_itws_airport_patterns = [
+    r'"product_header_airports"\s*:\s*"([^"]+)"',
+    r'"airports"\s*[:=]\s*"([^"]+)"',
+    r"<product_header_airports>([^<]+)</product_header_airports>",
+    r"<airports>([^<]+)</airports>",
+]
+
 
 def _first_match(payload: str, patterns: list[str]) -> str | None:
     for pattern in patterns:
@@ -36,11 +50,35 @@ def _all_locations(payload: str, patterns: list[str]) -> set[str]:
     return found
 
 
+def _derive_alert_type(raw: str) -> str:
+    raw = raw.strip().upper()
+    for suffix in (" ALERT PRODUCT", " ALERT", " PRODUCT"):
+        if raw.endswith(suffix):
+            raw = raw[: -len(suffix)].strip()
+    return raw.split()[0] if raw.split() else "MULT"
+
+
+def _itws_key(payload: str) -> str:
+    alert_raw = _first_match(payload, _itws_alert_patterns)
+    alert = _derive_alert_type(alert_raw) if alert_raw else "MULT"
+    locs = _all_locations(payload, _itws_airport_patterns)
+    if len(locs) > 1:
+        airport = "MULT"
+    elif len(locs) == 1:
+        airport = next(iter(locs))
+    else:
+        airport = "MULT"
+    return f"ITWS_{alert}_{airport}"
+
+
 def extract_key(payload: str, service: str, settings: Settings) -> str:
     service_lower = service.lower()
+    if service_lower == "itws":
+        return _itws_key(payload)
+
     msg_type = _first_match(payload, _msg_type_patterns)
 
-    if service_lower in _airport_services:
+    if service_lower == "notam":
         locs = _all_locations(payload, settings.swim_key_airport_patterns)
     else:
         locs = _all_locations(payload, settings.swim_key_flight_patterns)

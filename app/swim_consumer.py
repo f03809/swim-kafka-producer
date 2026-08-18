@@ -62,15 +62,23 @@ def _xml_to_json(payload: str) -> str:
         return payload
 
 
-def _should_drop(payload: str) -> bool:
+def _should_drop(payload: str, settings: Any) -> bool:
     try:
         parsed = json.loads(payload)
         if isinstance(parsed, dict) and isinstance(parsed.get("mis"), dict) and "hb" in parsed["mis"]:
             return True
         if isinstance(parsed, dict) and isinstance(parsed.get("itws_msg"), dict):
-            atis = parsed["itws_msg"].get("atis_pmsg", {})
+            itws = parsed["itws_msg"]
+            atis = itws.get("atis_pmsg", {})
             if atis.get("pmsg_status") == "OFF" or atis.get("pmsg_source") == "Timer":
                 return True
+            if getattr(settings, "swim_itws_drop_inactive_alerts", True):
+                for section in itws.values():
+                    if not isinstance(section, dict):
+                        continue
+                    for key, value in section.items():
+                        if key.endswith("_exists_flag") and value == "0":
+                            return True
         return False
     except Exception:
         return False
@@ -108,11 +116,13 @@ class _SwimMessageHandler(MessageHandler):
         service: str,
         queue_name: str,
         client_name: str,
+        settings: Any,
     ):
         self._incoming = incoming
         self._service = service
         self._queue_name = queue_name
         self._client_name = client_name
+        self._settings = settings
 
     def on_message(self, message: InboundMessage) -> None:
         payload = message.get_payload_as_string()
@@ -127,7 +137,7 @@ class _SwimMessageHandler(MessageHandler):
         if not payload.strip():
             _set_state(self._service, "connected", received_at=datetime.now(UTC))
             return
-        if _should_drop(payload):
+        if _should_drop(payload, self._settings):
             _set_state(self._service, "connected", received_at=datetime.now(UTC))
             return
         received_at = datetime.now(UTC)
@@ -209,6 +219,7 @@ class SwimConsumer:
                     service_key,
                     sub.queue,
                     client_name,
+                    self._settings,
                 )
                 await asyncio.to_thread(receiver.receive_async, handler)
                 logger.info("SWIM receiver started for %s", service_key)
