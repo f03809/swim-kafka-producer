@@ -62,6 +62,14 @@ def _xml_to_json(payload: str) -> str:
         return payload
 
 
+def _is_heartbeat(payload: str) -> bool:
+    try:
+        parsed = json.loads(payload)
+        return isinstance(parsed, dict) and isinstance(parsed.get("mis"), dict) and "hb" in parsed["mis"]
+    except Exception:
+        return False
+
+
 class _SolaceWarningHandler(logging.Handler):
     _app_id_pattern = re.compile(r"APP ID: tracker-([a-z0-9]+)-")
 
@@ -111,6 +119,9 @@ class _SwimMessageHandler(MessageHandler):
             )
         payload = _xml_to_json(payload)
         if not payload.strip():
+            _set_state(self._service, "connected", received_at=datetime.now(UTC))
+            return
+        if _is_heartbeat(payload):
             _set_state(self._service, "connected", received_at=datetime.now(UTC))
             return
         received_at = datetime.now(UTC)
