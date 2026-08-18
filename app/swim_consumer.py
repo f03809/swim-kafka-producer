@@ -62,10 +62,16 @@ def _xml_to_json(payload: str) -> str:
         return payload
 
 
-def _is_heartbeat(payload: str) -> bool:
+def _should_drop(payload: str) -> bool:
     try:
         parsed = json.loads(payload)
-        return isinstance(parsed, dict) and isinstance(parsed.get("mis"), dict) and "hb" in parsed["mis"]
+        if isinstance(parsed, dict) and isinstance(parsed.get("mis"), dict) and "hb" in parsed["mis"]:
+            return True
+        if isinstance(parsed, dict) and isinstance(parsed.get("itws_msg"), dict):
+            atis = parsed["itws_msg"].get("atis_pmsg", {})
+            if atis.get("pmsg_status") == "OFF" or atis.get("pmsg_source") == "Timer":
+                return True
+        return False
     except Exception:
         return False
 
@@ -121,7 +127,7 @@ class _SwimMessageHandler(MessageHandler):
         if not payload.strip():
             _set_state(self._service, "connected", received_at=datetime.now(UTC))
             return
-        if _is_heartbeat(payload):
+        if _should_drop(payload):
             _set_state(self._service, "connected", received_at=datetime.now(UTC))
             return
         received_at = datetime.now(UTC)
