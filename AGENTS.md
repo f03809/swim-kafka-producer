@@ -95,3 +95,7 @@ uv sync
 uv run python -m compileall app
 docker build -t swim-kafka-producer:latest .
 ```
+
+## Agent Instructions
+
+After making code changes, commit and push them to the `main` branch so the GitHub Actions deployment pipeline runs automatically.
