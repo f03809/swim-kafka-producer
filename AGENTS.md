@@ -104,10 +104,11 @@ After making code changes, commit and push them to the `main` branch so the GitH
 
 - The `swim-kafka-producer` and `swim-tfdm-consumer` share the same k3s Kubernetes cluster in the Proxmox homelab.
 - Kafka is at `10.0.0.94:9092` and is shared by the producer and consumer.
-- MongoDB is a Docker container on the dedicated MongoDB VM at `10.0.0.16`. The consumer uses it as the backing store for flight data.
+- MongoDB is installed as a `systemd` package on the dedicated MongoDB VM at `10.0.0.16`. The consumer uses it as the backing store for flight data.
 - The consumer needs MongoDB running as a replica set (`rs0`) to support change streams for the webhook dispatcher:
-  - Primary data node: `10.0.0.16`
-  - Secondary data node: external Proxmox VM (IP and SSH credentials to be provided)
-  - Arbiter: lightweight data-less voter on `10.0.0.16`
-- The Devin SSH key for the second MongoDB node is `C:\Users\f03809\Projects\swim-tfdm-consumer\.devin\keys\devin_loki_key` (public key in `devin_loki_key.pub`).
+  - Primary data node: `10.0.0.16:27017`
+  - Secondary data node: `10.1.1.27:27017` (currently initial-syncing; ~89 GB to copy)
+  - Arbiter: `10.0.0.16:27018`
+- Default write concern was set to `{ w: 1 }` while the secondary is initial-syncing, so consumer writes do not block waiting for a majority.
+- The Devin SSH key for the MongoDB nodes is `C:\Users\f03809\Projects\swim-tfdm-consumer\.devin\keys\devin_loki_key` (public key in `devin_loki_key.pub`). It is authorized on `root@10.0.0.16:22` and `root@10.1.1.27:22`.
 - The `aircraft-tracker` is currently local-only and not yet deployed to a Proxmox VM.
