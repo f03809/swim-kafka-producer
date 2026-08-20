@@ -99,3 +99,15 @@ docker build -t swim-kafka-producer:latest .
 ## Agent Instructions
 
 After making code changes, commit and push them to the `main` branch so the GitHub Actions deployment pipeline runs automatically.
+
+## Shared Homelab / Proxmox Setup
+
+- The `swim-kafka-producer` and `swim-tfdm-consumer` share the same k3s Kubernetes cluster in the Proxmox homelab.
+- Kafka is at `10.0.0.94:9092` and is shared by the producer and consumer.
+- MongoDB is a Docker container on the dedicated MongoDB VM at `10.0.0.16`. The consumer uses it as the backing store for flight data.
+- The consumer needs MongoDB running as a replica set (`rs0`) to support change streams for the webhook dispatcher:
+  - Primary data node: `10.0.0.16`
+  - Secondary data node: external Proxmox VM (IP and SSH credentials to be provided)
+  - Arbiter: lightweight data-less voter on `10.0.0.16`
+- The Devin SSH key for the second MongoDB node is `C:\Users\f03809\Projects\swim-tfdm-consumer\.devin\keys\devin_loki_key` (public key in `devin_loki_key.pub`).
+- The `aircraft-tracker` is currently local-only and not yet deployed to a Proxmox VM.
